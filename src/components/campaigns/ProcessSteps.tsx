@@ -23,6 +23,7 @@ export function ProcessSteps() {
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    if (wheelLockedRef.current) return;
     const nextStep = Math.min(
       movementContent.process.length - 1,
       Math.floor(progress * movementContent.process.length),
@@ -40,7 +41,7 @@ export function ProcessSteps() {
       const start = window.scrollY;
       const distance = destination - start;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const duration = reduceMotion ? 0 : 720;
+      const duration = reduceMotion ? 0 : 560;
       const startedAt = performance.now();
       const previousScrollBehavior = document.documentElement.style.scrollBehavior;
 
@@ -62,9 +63,7 @@ export function ProcessSteps() {
 
       const animate = (now: number) => {
         const progress = Math.min((now - startedAt) / duration, 1);
-        const eased = progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        const eased = 1 - Math.pow(1 - progress, 3);
 
         window.scrollTo(0, start + distance * eased);
         if (progress < 1) scrollAnimationRef.current = requestAnimationFrame(animate);
@@ -93,10 +92,12 @@ export function ProcessSteps() {
       wheelLockedRef.current = true;
 
       if (nextStep >= movementContent.process.length) {
-        scrollToPosition(sectionTop + section.offsetHeight);
+        scrollToPosition(sectionTop + scrollRange + 2);
       } else if (nextStep < 0) {
         scrollToPosition(Math.max(0, sectionTop - 1));
       } else {
+        activeStepRef.current = nextStep;
+        setActiveStep(nextStep);
         const stepProgress = (nextStep + 0.08) / movementContent.process.length;
         scrollToPosition(sectionTop + scrollRange * stepProgress);
       }
@@ -111,7 +112,7 @@ export function ProcessSteps() {
   }, []);
 
   return (
-    <div ref={sectionRef} className="relative h-[180svh] bg-zinc-950 md:h-[240svh]">
+    <div ref={sectionRef} className="relative h-[160svh] bg-zinc-950 md:h-[200svh]">
       <div className="sticky top-0 flex min-h-svh items-center overflow-hidden py-24">
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_75%_50%,rgba(255,191,0,0.11),transparent_35%)]" />
         <Container className="relative pr-12 sm:pr-20">
