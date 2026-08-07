@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #fff; color: #191919; font-family: "Inter Variable", Inter, system-ui, sans-serif; }
+::selection { background: #ffbf00; color: #000; }
+a, button, input, textarea { -webkit-tap-highlight-color: transparent; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
